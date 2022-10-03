@@ -15,7 +15,7 @@ func main() {
 		timeoutSeconds int
 	)
 	flag.StringVar(&address, "a", "", "address")
-	flag.StringVar(&address, "address", "192.168.64.64:64", "network address:port for the TCP connection to your 1541Ultimate")
+	flag.StringVar(&address, "address", "192.168.2.64:64", "network address:port for the TCP connection to your 1541Ultimate")
 	flag.IntVar(&timeoutSeconds, "timeout", 1, "connection timeout")
 	flag.Parse()
 	if flag.NArg() != 1 {

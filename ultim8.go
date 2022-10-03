@@ -1,10 +1,13 @@
 // Package ultim8 provides 1541Ultimate control to start programs and disks via TCP.
-// It is a port of Ucodenet by TTL (https://csdb.dk/release/?id=189723).
+// It is a partial port of Ucodenet by TTL (https://csdb.dk/release/?id=189723) in pure Go.
 package ultim8
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"time"
 )
@@ -53,11 +56,19 @@ func New(address string) (*manager, error) {
 	if err != nil {
 		return nil, fmt.Errorf("net.DialTimeout %q failed: %w", address, err)
 	}
-	return &manager{addr: address, c: conn}, nil
+	m := &manager{addr: address, c: conn}
+	go m.backgroundReader()
+	return m, nil
 }
 
-func (m *manager) sendCommand(cmd Command, length int) error {
-	if _, err := m.c.Write(cmd.Bytes(length)); err != nil {
+func (m *manager) SendCommand(cmd Command, data []byte) error {
+	if _, err := m.c.Write(cmd.Bytes(len(data))); err != nil {
+		return fmt.Errorf("m.c.Write failed: %w", err)
+	}
+	if len(data) == 0 {
+		return nil
+	}
+	if _, err := m.c.Write(data); err != nil {
 		return fmt.Errorf("m.c.Write failed: %w", err)
 	}
 	return nil
@@ -67,6 +78,7 @@ func (m *manager) Reset() error {
 	if _, err := m.c.Write(Reset.Bytes(0)); err != nil {
 		return fmt.Errorf("m.c.Write failed: %w", err)
 	}
+	fmt.Println("[CMD] Reset")
 	time.Sleep(time.Second)
 	return nil
 }
@@ -79,15 +91,29 @@ func (m *manager) RunPrg(r io.Reader) error {
 	if err = m.Reset(); err != nil {
 		return fmt.Errorf("m.Reset failed: %w", err)
 	}
-	if err = m.sendCommand(DMARun, len(buf)); err != nil {
+	if err = m.SendCommand(DMARun, buf); err != nil {
 		return fmt.Errorf("m.sendCommand DMARun failed: %w", err)
 	}
-	if _, err = m.c.Write(buf); err != nil {
-		return fmt.Errorf("m.c.Write failed: %w", err)
-	}
+	fmt.Println("[CMD] RunPrg")
 	return nil
 }
 
 func (m *manager) Close() error {
 	return m.c.Close()
+}
+
+func (m *manager) backgroundReader() {
+	for {
+		var buf bytes.Buffer
+		_, err := io.Copy(&buf, m.c)
+		if err == io.EOF || errors.Is(err, net.ErrClosed) {
+			fmt.Println("[1541U] Closed connection")
+			break
+		}
+		if err != nil {
+			log.Printf("backgroundReader io.Copy failed: %v", err)
+			return
+		}
+		fmt.Println("[1541U] ", string(buf.Bytes()))
+	}
 }
