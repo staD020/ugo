@@ -16,19 +16,15 @@ import (
 // DialTimeout contains timeout for the initial TCP connection to your 1541u.
 var DialTimeout = 3 * time.Second
 
-// Command specifies the various commands that can be sent to the 1541u.
+// Command specifies the various commands you can send to the 1541u.
+type Command uint16
+
+// All 1541u commands.
 //
 // Generic structure is:
 //
 // command lo, command hi, payload length lo, payload length hi
 // followed by its payload, if any.
-type Command uint16
-
-// All 1541u commands.
-//
-// generic structure is:
-// command lo, command hi, number of parameters lo, number of parameters hi
-// followed by the parameters
 const (
 	DMA         Command = 0xff01 // dma-load .prg file
 	DMARun      Command = 0xff02 // dma-load .prg file and run it
@@ -51,7 +47,7 @@ func (c Command) Bytes(length int) []byte {
 	}
 }
 
-// Bytes returns the string representation of the command, not including the length of the payload.
+// String returns the hexadecimal string representation of the command.
 func (c Command) String() string {
 	return fmt.Sprintf("0x%04x", uint16(c))
 }
