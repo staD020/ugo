@@ -16,6 +16,8 @@ import (
 // DialTimeout contains timeout for the initial TCP connection to your 1541u.
 var DialTimeout = 3 * time.Second
 
+const D64Size = 174848
+
 // Command specifies the various commands you can send to the 1541u.
 type Command uint16
 
@@ -48,7 +50,18 @@ func (c Command) Bytes(length int) []byte {
 
 // String returns the hexadecimal string representation of the command.
 func (c Command) String() string {
-	return fmt.Sprintf("0x%04x", uint16(c))
+	s := "n/a"
+	switch c {
+	case DMARun:
+		s = "DMARun"
+	case Reset:
+		s = "Reset"
+	case RunImage:
+		s = "RunImage"
+	case MountImage:
+		s = "MountImage"
+	}
+	return fmt.Sprintf("%s 0x%04x", s, uint16(c))
 }
 
 // Manager is the struct containing the net.Conn to your 1541u.
@@ -71,11 +84,12 @@ func New(address string) (*Manager, error) {
 	return m, nil
 }
 
-// SendCommand sends a bytestream of the Command, it's length and payload, which may be nil.
-func (m *Manager) SendCommand(cmd Command, payload []byte) error {
+// Send sends a bytestream of the Command, it's length and payload, which may be nil.
+func (m *Manager) Send(cmd Command, payload []byte) error {
 	if _, err := m.c.Write(cmd.Bytes(len(payload))); err != nil {
 		return fmt.Errorf("Write failed: %w", err)
 	}
+	fmt.Printf("[CMD] %s\n", cmd)
 	if len(payload) == 0 {
 		return nil
 	}
@@ -87,37 +101,16 @@ func (m *Manager) SendCommand(cmd Command, payload []byte) error {
 
 // Reset sends the Reset Command to the 1541u and sleeps for a second.
 func (m *Manager) Reset() error {
-	if err := m.SendCommand(Reset, nil); err != nil {
-		return fmt.Errorf("SendCommand Reset failed: %w", err)
+	if err := m.Send(Reset, nil); err != nil {
+		return fmt.Errorf("Send Reset failed: %w", err)
 	}
-	fmt.Println("[CMD] Reset")
 	time.Sleep(time.Second)
-	return nil
-}
-
-// RunPrg executes Manager.Run with Command DMARun.
-func (m *Manager) RunPrg(r io.Reader) error {
-	err := m.Run(DMARun, r)
-	if err != nil {
-		return fmt.Errorf("Run DMARun failed: %w", err)
-	}
-	fmt.Println("[CMD] RunPrg")
-	return nil
-}
-
-// RunPrg executes Manager.Run with Command DMARun.
-func (m *Manager) RunImage(r io.Reader) error {
-	err := m.Run(RunImage, r)
-	if err != nil {
-		return fmt.Errorf("Run RunImage failed: %w", err)
-	}
-	fmt.Println("[CMD] RunImage")
 	return nil
 }
 
 // RunPrg drains the input Reader and uploads it to the 1541u with Command cmd.
 // Before upload, the Reset Command is sent.
-func (m *Manager) Run(cmd Command, r io.Reader) error {
+func (m *Manager) Run(r io.Reader) error {
 	buf, err := io.ReadAll(r)
 	if err != nil {
 		return fmt.Errorf("io.ReadAll failed: %w", err)
@@ -125,8 +118,12 @@ func (m *Manager) Run(cmd Command, r io.Reader) error {
 	if err = m.Reset(); err != nil {
 		return fmt.Errorf("Reset failed: %w", err)
 	}
-	if err = m.SendCommand(cmd, buf); err != nil {
-		return fmt.Errorf("sendCommand %s failed: %w", cmd, err)
+	cmd := DMARun
+	if len(buf) >= D64Size {
+		cmd = RunImage
+	}
+	if err = m.Send(cmd, buf); err != nil {
+		return fmt.Errorf("Send %s failed: %w", cmd, err)
 	}
 	return nil
 }

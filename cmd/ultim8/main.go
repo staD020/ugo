@@ -25,25 +25,33 @@ func main() {
 	flag.StringVar(&address, "a", address, "network address:port for the TCP connection to your 1541Ultimate")
 	flag.IntVar(&timeoutSeconds, "timeout", 1, "connection timeout")
 	flag.Parse()
-	if flag.NArg() != 1 {
+	n := flag.NArg()
+	if n < 1 {
 		printUsage()
 		return
 	}
-	path := flag.Args()[0]
 	ultim8.DialTimeout = time.Duration(timeoutSeconds) * time.Second
+	path := flag.Args()[0]
 
-	f, err := os.Open(path)
-	if err != nil {
-		log.Fatalf("os.Open %q failed: %v", path, err)
-	}
-	defer f.Close()
 	u, err := ultim8.New(address)
 	if err != nil {
-		log.Fatalf("New %q failed: %v", address, err)
+		log.Fatalf("ultim8.New %q failed: %v", address, err)
 	}
 	defer u.Close()
-	if err = u.RunPrg(f); err != nil {
-		log.Fatalf("u.RunPrg failed: %v", err)
+	if err = process(u, path); err != nil {
+		log.Fatalf("process %q failed: %v", path, err)
 	}
 	return
+}
+
+func process(u *ultim8.Manager, path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("os.Open %q failed: %v", path, err)
+	}
+	defer f.Close()
+	if err = u.Run(f); err != nil {
+		return fmt.Errorf("u.Run failed: %v", err)
+	}
+	return nil
 }
