@@ -2,12 +2,17 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/staD020/ultim8"
 )
+
+func printUsage() {
+	fmt.Println("usage: ./ultim8 [-help -a 127.0.0.1:64 -timeout 3] FILE")
+}
 
 func main() {
 	var (
@@ -19,7 +24,8 @@ func main() {
 	flag.IntVar(&timeoutSeconds, "timeout", 1, "connection timeout")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		log.Fatalf("Incorrect number of arguments: %d", flag.NArg())
+		printUsage()
+		return
 	}
 	path := flag.Args()[0]
 	ultim8.DialTimeout = time.Duration(timeoutSeconds) * time.Second
@@ -29,7 +35,6 @@ func main() {
 		log.Fatalf("os.Open %q failed: %v", path, err)
 	}
 	defer f.Close()
-
 	u, err := ultim8.New(address)
 	if err != nil {
 		log.Fatalf("New %q failed: %v", address, err)
