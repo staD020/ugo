@@ -40,12 +40,13 @@ const (
 	RunImage    Command = 0xff0b // mount and run image
 )
 
-// Bytes returns the bytes representing this Command, 2 bytes for the command, 2 bytes for length.
+// Bytes returns the bytes representing this Command, 2 bytes for the command, 2 or 3 bytes for length.
 func (c Command) Bytes(length int) []byte {
-	return []byte{
-		byte(c & 0xff), byte(c >> 8),
-		byte(length & 0xff), byte(length >> 8),
+	buf := []byte{byte(c & 0xff), byte(c >> 8)}
+	if c == MountImage || c == RunImage {
+		return append(buf, byte(length&0xff), byte((length>>8)&0xff), byte((length>>16)&0xff))
 	}
+	return append(buf, byte(length&0xff), byte(length>>8))
 }
 
 // String returns the hexadecimal string representation of the command.
