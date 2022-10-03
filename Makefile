@@ -2,11 +2,12 @@ GOBUILDFLAGS=-v -trimpath
 LDFLAGS=-s -w
 TARGET=ultim8
 SRC=*.go cmd/ultim8/main.go
+CGO=0
 
 all: $(TARGET)
 
 $(TARGET): $(SRC)
-	go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)" -o ./ ./cmd/...
+	CGO_ENABLED=$(CGO) go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)" -o ./ ./cmd/...
 
 cross: $(SRC)
 	CGO_ENABLED=$(CGO) GOOS=darwin GOARCH=arm64 go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)" -o ultim8_darwin_arm64 ./cmd/ultim8/
