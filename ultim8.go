@@ -22,7 +22,6 @@ type Command uint16
 // All 1541u commands.
 //
 // Generic structure is:
-//
 // command lo, command hi, payload length lo, payload length hi
 // followed by its payload, if any.
 const (
@@ -66,6 +65,7 @@ func New(address string) (*Manager, error) {
 	if err != nil {
 		return nil, fmt.Errorf("net.DialTimeout %q failed: %w", address, err)
 	}
+	fmt.Println("[1541U] Connection established")
 	m := &Manager{addr: address, c: conn, done: make(chan bool, 1)}
 	go m.backgroundReader()
 	return m, nil
@@ -74,13 +74,13 @@ func New(address string) (*Manager, error) {
 // SendCommand sends a bytestream of the Command, it's length and payload, which may be nil.
 func (m *Manager) SendCommand(cmd Command, payload []byte) error {
 	if _, err := m.c.Write(cmd.Bytes(len(payload))); err != nil {
-		return fmt.Errorf("m.c.Write failed: %w", err)
+		return fmt.Errorf("Write failed: %w", err)
 	}
 	if len(payload) == 0 {
 		return nil
 	}
 	if _, err := m.c.Write(payload); err != nil {
-		return fmt.Errorf("m.c.Write failed: %w", err)
+		return fmt.Errorf("Write failed: %w", err)
 	}
 	return nil
 }
@@ -88,7 +88,7 @@ func (m *Manager) SendCommand(cmd Command, payload []byte) error {
 // Reset sends the Reset Command to the 1541u and sleeps for a second.
 func (m *Manager) Reset() error {
 	if err := m.SendCommand(Reset, nil); err != nil {
-		return fmt.Errorf("m.SendCommand Reset failed: %w", err)
+		return fmt.Errorf("SendCommand Reset failed: %w", err)
 	}
 	fmt.Println("[CMD] Reset")
 	time.Sleep(time.Second)
@@ -103,10 +103,10 @@ func (m *Manager) RunPrg(r io.Reader) error {
 		return fmt.Errorf("io.ReadAll failed: %w", err)
 	}
 	if err = m.Reset(); err != nil {
-		return fmt.Errorf("m.Reset failed: %w", err)
+		return fmt.Errorf("Reset failed: %w", err)
 	}
 	if err = m.SendCommand(DMARun, buf); err != nil {
-		return fmt.Errorf("m.sendCommand DMARun failed: %w", err)
+		return fmt.Errorf("sendCommand DMARun failed: %w", err)
 	}
 	fmt.Println("[CMD] RunPrg")
 	return nil
@@ -126,7 +126,7 @@ func (m *Manager) backgroundReader() {
 		var buf bytes.Buffer
 		_, err := io.Copy(&buf, m.c)
 		if err == io.EOF || errors.Is(err, net.ErrClosed) {
-			fmt.Println("[1541U] Closed connection")
+			fmt.Println("[1541U] Connection closed")
 			break
 		}
 		if err != nil {

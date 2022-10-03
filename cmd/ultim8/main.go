@@ -11,16 +11,18 @@ import (
 )
 
 func printUsage() {
-	fmt.Println("usage: ./ultim8 [-help -a 127.0.0.1:64 -timeout 3] FILE")
+	fmt.Println("usage: ./ultim8 [-h -a 127.0.0.1:64 -timeout 3] FILE")
 }
 
 func main() {
 	var (
-		address        string
+		address        = "192.168.2.64:64"
 		timeoutSeconds int
 	)
-	flag.StringVar(&address, "a", "", "address")
-	flag.StringVar(&address, "address", "192.168.2.64:64", "network address:port for the TCP connection to your 1541Ultimate")
+	if s := os.Getenv("ULTIM8"); s != "" {
+		address = s
+	}
+	flag.StringVar(&address, "a", address, "network address:port for the TCP connection to your 1541Ultimate")
 	flag.IntVar(&timeoutSeconds, "timeout", 1, "connection timeout")
 	flag.Parse()
 	if flag.NArg() != 1 {
