@@ -16,7 +16,10 @@ import (
 // DialTimeout contains timeout for the initial TCP connection to your 1541u.
 var DialTimeout = 3 * time.Second
 
-const D64Size = 174848
+const (
+	D64Size = 174848
+	Version = "0.1"
+)
 
 // Command specifies the various commands you can send to the 1541u.
 type Command uint16
@@ -40,7 +43,7 @@ const (
 	RunImage    Command = 0xff0b // mount and run image
 )
 
-// Bytes returns the bytes representing this Command, 2 bytes for the command, 2 or 3 bytes for length.
+// Bytes returns the bytes representing this Command, 2 bytes for the command and 2 or 3 bytes for length.
 func (c Command) Bytes(length int) []byte {
 	buf := []byte{byte(c & 0xff), byte(c >> 8)}
 	if c == MountImage || c == RunImage {
@@ -109,7 +112,7 @@ func (m *Manager) Reset() error {
 	return nil
 }
 
-// RunPrg drains the input Reader and uploads it to the 1541u with Command cmd.
+// Run drains the input Reader and uploads it to the 1541u with Command cmd.
 // Before upload, the Reset Command is sent.
 func (m *Manager) Run(r io.Reader) error {
 	buf, err := io.ReadAll(r)
