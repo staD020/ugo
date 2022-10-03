@@ -95,9 +95,29 @@ func (m *Manager) Reset() error {
 	return nil
 }
 
-// RunPrg drains the input Reader and uploads it to the 1541u and starts the program with RUN.
-// Before upload, the Reset Command is sent.
+// RunPrg executes Manager.Run with Command DMARun.
 func (m *Manager) RunPrg(r io.Reader) error {
+	err := m.Run(DMARun, r)
+	if err != nil {
+		return fmt.Errorf("Run DMARun failed: %w", err)
+	}
+	fmt.Println("[CMD] RunPrg")
+	return nil
+}
+
+// RunPrg executes Manager.Run with Command DMARun.
+func (m *Manager) RunImage(r io.Reader) error {
+	err := m.Run(RunImage, r)
+	if err != nil {
+		return fmt.Errorf("Run RunImage failed: %w", err)
+	}
+	fmt.Println("[CMD] RunImage")
+	return nil
+}
+
+// RunPrg drains the input Reader and uploads it to the 1541u with Command cmd.
+// Before upload, the Reset Command is sent.
+func (m *Manager) Run(cmd Command, r io.Reader) error {
 	buf, err := io.ReadAll(r)
 	if err != nil {
 		return fmt.Errorf("io.ReadAll failed: %w", err)
@@ -105,10 +125,9 @@ func (m *Manager) RunPrg(r io.Reader) error {
 	if err = m.Reset(); err != nil {
 		return fmt.Errorf("Reset failed: %w", err)
 	}
-	if err = m.SendCommand(DMARun, buf); err != nil {
-		return fmt.Errorf("sendCommand DMARun failed: %w", err)
+	if err = m.SendCommand(cmd, buf); err != nil {
+		return fmt.Errorf("sendCommand %s failed: %w", cmd, err)
 	}
-	fmt.Println("[CMD] RunPrg")
 	return nil
 }
 
