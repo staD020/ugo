@@ -164,16 +164,16 @@ func (m *Manager) backgroundReader() {
 		var buf bytes.Buffer
 		_, err := io.Copy(&buf, m.c)
 		switch {
-		case err == nil:
-			fmt.Println("[1541U] ", string(buf.Bytes()))
 		case errors.Is(err, net.ErrClosed):
 			fmt.Println("[1541U] Connection closed")
 			return
 		case errors.Is(err, io.EOF):
 			fmt.Println("[1541U] EOF")
 			return
-		default:
+		case err != nil:
 			log.Printf("backgroundReader io.Copy failed: %v", err)
+			return
 		}
+		fmt.Println("[1541U] ", string(buf.Bytes()))
 	}
 }
