@@ -16,7 +16,7 @@ test: $(TARGET)
 	go test -v -cover -race
 	./$(TARGET) -a localhost:6464 testdata/evoluer.prg
 
-install:
+install: $(TARGET)
 	sudo cp $(TARGET) /usr/local/bin/
 
 clean:

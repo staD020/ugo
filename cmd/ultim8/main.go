@@ -77,17 +77,18 @@ func process(u *ultim8.Manager, path string, mount bool) error {
 }
 
 func processMulti(u *ultim8.Manager, files []string, mount bool) error {
-	fmt.Printf("Multi mode, starting image %q\n", files[0])
 	f, err := os.Open(files[0])
 	if err != nil {
 		return fmt.Errorf("os.Open %q failed: %v", files[0], err)
 	}
 	defer f.Close()
 	if mount {
+		fmt.Printf("Multi mode, mounting image %q\n", files[0])
 		if err = u.Mount(f); err != nil {
 			return fmt.Errorf("u.Mount failed: %v", err)
 		}
 	} else {
+		fmt.Printf("Multi mode, starting image %q\n", files[0])
 		if err = u.Run(f); err != nil {
 			return fmt.Errorf("u.Run failed: %v", err)
 		}

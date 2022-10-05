@@ -160,10 +160,14 @@ func (m *Manager) Close() error {
 // It signals the m.done channel when the connection is closed or on error.
 func (m *Manager) backgroundReader() {
 	defer func() { m.done <- true }()
+LOOP:
 	for {
 		var buf bytes.Buffer
-		_, err := io.Copy(&buf, m.c)
+		n, err := io.Copy(&buf, m.c)
 		switch {
+		case err == nil && n > 0:
+			fmt.Println("[1541U] ", buf.String())
+			continue LOOP
 		case errors.Is(err, net.ErrClosed):
 			fmt.Println("[1541U] Connection closed")
 			return
@@ -174,6 +178,7 @@ func (m *Manager) backgroundReader() {
 			log.Printf("backgroundReader io.Copy failed: %v", err)
 			return
 		}
-		fmt.Println("[1541U] ", buf.String())
+		log.Print("backgroundReader error, aborting read")
+		return
 	}
 }
