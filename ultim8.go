@@ -52,7 +52,7 @@ func (c Command) Bytes(length int) []byte {
 	return append(buf, byte(length&0xff), byte(length>>8))
 }
 
-// String returns the hexadecimal string representation of the command.
+// String returns the string representation of the command.
 func (c Command) String() string {
 	s := "n/a"
 	switch c {
@@ -67,7 +67,7 @@ func (c Command) String() string {
 	case MountImage:
 		s = "MountImage"
 	}
-	return fmt.Sprintf("%s 0x%04x", s, uint16(c))
+	return fmt.Sprintf("%-10s 0x%04x", s, uint16(c))
 }
 
 // Manager is the struct containing the net.Conn to your 1541u.
@@ -165,7 +165,7 @@ func (m *Manager) backgroundReader() {
 		_, err := io.Copy(&buf, m.c)
 		switch {
 		case err == nil:
-			break
+			fmt.Println("[1541U] ", string(buf.Bytes()))
 		case errors.Is(err, net.ErrClosed):
 			fmt.Println("[1541U] Connection closed")
 			return
@@ -175,6 +175,5 @@ func (m *Manager) backgroundReader() {
 		default:
 			log.Printf("backgroundReader io.Copy failed: %v", err)
 		}
-		fmt.Println("[1541U] ", string(buf.Bytes()))
 	}
 }
