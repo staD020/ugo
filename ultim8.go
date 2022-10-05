@@ -174,6 +174,6 @@ func (m *Manager) backgroundReader() {
 			log.Printf("backgroundReader io.Copy failed: %v", err)
 			return
 		}
-		fmt.Println("[1541U] ", string(buf.Bytes()))
+		fmt.Println("[1541U] ", buf.String())
 	}
 }
