@@ -1,6 +1,7 @@
 package ultim8
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -21,22 +22,8 @@ func TestCommandBytes(t *testing.T) {
 	}
 	for _, c := range cases {
 		got := c.cmd.Bytes(c.length)
-		if !equalBytes(got, c.want) {
+		if !bytes.Equal(got, c.want) {
 			t.Errorf("Command %s len %d -> got: %v, want %v", c.cmd, c.length, got, c.want)
 		}
 	}
-}
-
-// equal tells whether a and b contain the same elements.
-// A nil argument is equivalent to an empty slice.
-func equalBytes(a, b []byte) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-	return true
 }
