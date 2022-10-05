@@ -56,6 +56,8 @@ func (c Command) Bytes(length int) []byte {
 func (c Command) String() string {
 	s := "n/a"
 	switch c {
+	case DMA:
+		s = "DMA"
 	case DMARun:
 		s = "DMARun"
 	case Reset:
@@ -132,6 +134,22 @@ func (m *Manager) Run(r io.Reader) error {
 	return nil
 }
 
+// Mount drains the Reader and uploads it to the 1541u with Command MountImage or DMA.
+func (m *Manager) Mount(r io.Reader) error {
+	buf, err := io.ReadAll(r)
+	if err != nil {
+		return fmt.Errorf("io.ReadAll failed: %w", err)
+	}
+	cmd := DMA
+	if len(buf) >= D64Size {
+		cmd = MountImage
+	}
+	if err = m.Send(cmd, buf); err != nil {
+		return fmt.Errorf("Send %s failed: %w", cmd, err)
+	}
+	return nil
+}
+
 // Close closes the TCP connection and waits for clean disconnect.
 func (m *Manager) Close() error {
 	defer func() { <-m.done }()
@@ -139,19 +157,23 @@ func (m *Manager) Close() error {
 }
 
 // backgroundReader listen to responses from the 1541u and prints them to stdout.
-// It signals the m.done channel when the connection closed is closed or on error.
+// It signals the m.done channel when the connection is closed or on error.
 func (m *Manager) backgroundReader() {
 	defer func() { m.done <- true }()
 	for {
 		var buf bytes.Buffer
 		_, err := io.Copy(&buf, m.c)
-		if err == io.EOF || errors.Is(err, net.ErrClosed) {
-			fmt.Println("[1541U] Connection closed")
+		switch {
+		case err == nil:
 			break
-		}
-		if err != nil {
-			log.Printf("backgroundReader io.Copy failed: %v", err)
+		case errors.Is(err, net.ErrClosed):
+			fmt.Println("[1541U] Connection closed")
 			return
+		case err == io.EOF:
+			fmt.Println("[1541U] EOF")
+			return
+		default:
+			log.Printf("backgroundReader io.Copy failed: %v", err)
 		}
 		fmt.Println("[1541U] ", string(buf.Bytes()))
 	}

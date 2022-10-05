@@ -18,12 +18,15 @@ func main() {
 	var (
 		address        = "192.168.2.64:64"
 		timeoutSeconds = 1
+		mount          = false
 	)
 	if s := os.Getenv("ULTIM8"); s != "" {
 		address = s
 	}
 	flag.StringVar(&address, "a", address, "network address:port for the TCP connection to your 1541Ultimate")
 	flag.IntVar(&timeoutSeconds, "timeout", timeoutSeconds, "connection timeout in seconds")
+	flag.BoolVar(&mount, "m", mount, "mount")
+	flag.BoolVar(&mount, "mount", mount, "always mount, never reset")
 	flag.Parse()
 	n := flag.NArg()
 	if n < 1 {
@@ -38,18 +41,24 @@ func main() {
 		log.Fatalf("ultim8.New %q failed: %v", address, err)
 	}
 	defer u.Close()
-	if err = process(u, path); err != nil {
+	if err = process(u, path, mount); err != nil {
 		log.Fatalf("process %q failed: %v", path, err)
 	}
 	return
 }
 
-func process(u *ultim8.Manager, path string) error {
+func process(u *ultim8.Manager, path string, mount bool) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("os.Open %q failed: %v", path, err)
 	}
 	defer f.Close()
+	if mount {
+		if err = u.Mount(f); err != nil {
+			return fmt.Errorf("u.Mount failed: %v", err)
+		}
+		return nil
+	}
 	if err = u.Run(f); err != nil {
 		return fmt.Errorf("u.Run failed: %v", err)
 	}
