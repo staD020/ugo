@@ -14,7 +14,8 @@ import (
 )
 
 func printUsage() {
-	fmt.Println("usage: ./ultim8 [-h -a 127.0.0.1:64 -timeout 3] FILE")
+	fmt.Printf("ultim8 %s by burg - a partial port of ucodenet to Go\n", ultim8.Version)
+	fmt.Println("usage: ./ultim8 [-h -a 127.0.0.1:64 -timeout 3] FILE [FILES]")
 }
 
 func main() {
