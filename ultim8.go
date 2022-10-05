@@ -169,7 +169,7 @@ func (m *Manager) backgroundReader() {
 		case errors.Is(err, net.ErrClosed):
 			fmt.Println("[1541U] Connection closed")
 			return
-		case err == io.EOF:
+		case errors.Is(err, io.EOF):
 			fmt.Println("[1541U] EOF")
 			return
 		default:
