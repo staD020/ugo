@@ -17,13 +17,13 @@ func printUsage() {
 func main() {
 	var (
 		address        = "192.168.2.64:64"
-		timeoutSeconds int
+		timeoutSeconds = 1
 	)
 	if s := os.Getenv("ULTIM8"); s != "" {
 		address = s
 	}
 	flag.StringVar(&address, "a", address, "network address:port for the TCP connection to your 1541Ultimate")
-	flag.IntVar(&timeoutSeconds, "timeout", 1, "connection timeout")
+	flag.IntVar(&timeoutSeconds, "timeout", timeoutSeconds, "connection timeout in seconds")
 	flag.Parse()
 	n := flag.NArg()
 	if n < 1 {
