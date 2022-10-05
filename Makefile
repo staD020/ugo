@@ -13,6 +13,7 @@ cross: $(SRC)
 	CGO_ENABLED=$(CGO) GOOS=darwin GOARCH=arm64 go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)" -o ultim8_darwin_arm64 ./cmd/ultim8/
 
 test: $(TARGET)
+	go test -v -cover -race
 	./$(TARGET) -a localhost:6464 testdata/evoluer.prg
 
 install:
