@@ -28,12 +28,12 @@ func main() {
 	flag.BoolVar(&mount, "m", mount, "mount")
 	flag.BoolVar(&mount, "mount", mount, "always mount, never reset")
 	flag.Parse()
+	ultim8.DialTimeout = time.Duration(timeoutSeconds) * time.Second
 	n := flag.NArg()
-	if n < 1 {
+	if n == 1 {
 		printUsage()
 		return
 	}
-	ultim8.DialTimeout = time.Duration(timeoutSeconds) * time.Second
 	path := flag.Args()[0]
 
 	u, err := ultim8.New(address)
