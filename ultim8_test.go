@@ -11,18 +11,25 @@ func TestCommandBytes(t *testing.T) {
 		want   []byte
 	}{
 		{Reset, 0, []byte{0x4, 0xff, 0x0, 0x0}},
+		{DMARun, 0, []byte{0x2, 0xff, 0x0, 0x0}},
+		{RunImage, 0, []byte{0xb, 0xff, 0x0, 0x0, 0x0}},
+		{MountImage, 0, []byte{0xa, 0xff, 0x0, 0x0, 0x0}},
+
+		{DMARun, 256, []byte{0x2, 0xff, 0x0, 0x1}},
+		{RunImage, 51308, []byte{0xb, 0xff, 0x6c, 0xc8, 0x0}},
+		{MountImage, 174848, []byte{0xa, 0xff, 0x0, 0xab, 0x2}},
 	}
 	for _, c := range cases {
-		got := c.cmd.Bytes(0)
-		if !equalSlice(got, c.want) {
-			t.Errorf("Command %s -> got: %v, want %v", c.cmd, got, c.want)
+		got := c.cmd.Bytes(c.length)
+		if !equalBytes(got, c.want) {
+			t.Errorf("Command %s len %d -> got: %v, want %v", c.cmd, c.length, got, c.want)
 		}
 	}
 }
 
 // equal tells whether a and b contain the same elements.
 // A nil argument is equivalent to an empty slice.
-func equalSlice(a, b []byte) bool {
+func equalBytes(a, b []byte) bool {
 	if len(a) != len(b) {
 		return false
 	}
