@@ -81,16 +81,16 @@ func processMulti(u *ugo.Manager, files []string, mount bool) error {
 		return fmt.Errorf("os.Open %q failed: %v", files[0], err)
 	}
 	defer f.Close()
+	var fn func(f io.Reader) error
+	a := "u.Run"
+	fn = u.Run
 	if mount {
-		fmt.Printf("Multi mode, mounting image %q\n", files[0])
-		if err = u.Mount(f); err != nil {
-			return fmt.Errorf("u.Mount failed: %v", err)
-		}
-	} else {
-		fmt.Printf("Multi mode, starting image %q\n", files[0])
-		if err = u.Run(f); err != nil {
-			return fmt.Errorf("u.Run failed: %v", err)
-		}
+		a = "u.Mount"
+		fn = u.Mount
+	}
+	fmt.Printf("Multi mode, %s image %q\n", a, files[0])
+	if err = fn(f); err != nil {
+		return fmt.Errorf("%s failed: %v", a, err)
 	}
 
 	r := bufio.NewReader(os.Stdin)
