@@ -33,6 +33,7 @@ func main() {
     f, _ := os.Open("file.prg")
     defer f.Close()
     u, _ := ugo.New("192.168.2.64:64")
+    defer u.Close()
     _ = u.Run(f)
     return
 }
