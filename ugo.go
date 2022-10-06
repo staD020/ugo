@@ -24,7 +24,7 @@ const (
 // Command specifies the various commands you can send to the 1541u.
 type Command uint16
 
-// All 1541u commands.
+// All 1541u commands. But only DMA, DMARun, Reset, MountImage and RunImage have been tested.
 //
 // Generic structure is:
 // command lo, command hi, payload length lo, payload length hi
@@ -90,16 +90,16 @@ func New(address string) (*Manager, error) {
 	return m, nil
 }
 
-// Send sends a bytestream of the Command, it's length and payload, which may be nil.
-func (m *Manager) Send(cmd Command, payload []byte) error {
-	if _, err := m.c.Write(cmd.Bytes(len(payload))); err != nil {
+// Send sends a bytestream of the Command, payload length and content, which may be nil.
+func (m *Manager) Send(cmd Command, p []byte) error {
+	if _, err := m.c.Write(cmd.Bytes(len(p))); err != nil {
 		return fmt.Errorf("Write failed: %w", err)
 	}
 	fmt.Printf("[CMD] %s\n", cmd)
-	if len(payload) == 0 {
+	if len(p) == 0 {
 		return nil
 	}
-	if _, err := m.c.Write(payload); err != nil {
+	if _, err := m.c.Write(p); err != nil {
 		return fmt.Errorf("Write failed: %w", err)
 	}
 	return nil
