@@ -178,7 +178,8 @@ LOOP:
 			log.Printf("backgroundReader io.Copy failed: %v", err)
 			return
 		}
-		log.Print("backgroundReader error, aborting read")
+		fmt.Println()
+		log.Fatal("[1541U] Connection closed unexpectedly")
 		return
 	}
 }

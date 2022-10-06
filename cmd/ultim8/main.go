@@ -29,8 +29,7 @@ func main() {
 	}
 	flag.StringVar(&address, "a", address, "network address:port for the TCP connection to your 1541Ultimate")
 	flag.IntVar(&timeoutSeconds, "timeout", timeoutSeconds, "connection timeout in seconds")
-	flag.BoolVar(&mount, "m", mount, "mount")
-	flag.BoolVar(&mount, "mount", mount, "always mount, never reset")
+	flag.BoolVar(&mount, "m", mount, "always mount, never reset")
 	flag.Parse()
 	ultim8.DialTimeout = time.Duration(timeoutSeconds) * time.Second
 	n := flag.NArg()
@@ -107,7 +106,7 @@ func processMulti(u *ultim8.Manager, files []string, mount bool) error {
 		}
 		f, err := os.Open(files[i])
 		if err != nil {
-			return fmt.Errorf("r.ReadString failed: %w", err)
+			return fmt.Errorf("os.Open %q failed: %w", files[i], err)
 		}
 		defer f.Close()
 		if err = u.Mount(f); err != nil {
