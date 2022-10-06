@@ -15,7 +15,7 @@ import (
 
 func printUsage() {
 	fmt.Printf("ugo %s by burg - a partial port of ucodenet to Go\n", ugo.Version)
-	fmt.Println("usage: ./ugo [-h -a 127.0.0.1:64 -timeout 3] FILE [FILES]")
+	fmt.Println("usage: ./ugo [-h -a 192.168.2.64:64 -timeout 3] FILE [FILES]")
 }
 
 func main() {

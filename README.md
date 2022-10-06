@@ -16,3 +16,25 @@ It is a partial port of [Ucodenet](https://csdb.dk/release/?id=189723) by TTL in
 ## Install Command-line Interface
 
 `go install github.com/staD020/ugo@latest`
+
+## Use Library
+
+Error handling omitted, see source for more options.
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+    "github.com/staD020/ugo"
+)
+
+func main() {
+    f, _ := os.Open("file.prg")
+    defer f.Close()
+    u, _ := ugo.New("192.168.2.64:64")
+    _ = u.Run(f)
+    return
+}
+```
