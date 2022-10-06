@@ -1,6 +1,6 @@
-# ultim8 0.1
+# ugo 0.1
 
-Ultim8 provides 1541Ultimate control to run and mount C64 programs and disks via TCP.
+Ugo provides 1541Ultimate control to run and mount C64 programs and disks via TCP.
 It is a partial port of [Ucodenet](https://csdb.dk/release/?id=189723) by TTL in pure Go by burg.
 
 ## Features
@@ -11,8 +11,8 @@ It is a partial port of [Ucodenet](https://csdb.dk/release/?id=189723) by TTL in
 
 ## Install Library
 
-`go get github.com/staD020/ultim8`
+`go get github.com/staD020/ugo`
 
 ## Install Command-line Interface
 
-`go install github.com/staD020/ultim8@latest`
+`go install github.com/staD020/ugo@latest`

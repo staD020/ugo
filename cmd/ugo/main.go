@@ -10,12 +10,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/staD020/ultim8"
+	"github.com/staD020/ugo"
 )
 
 func printUsage() {
-	fmt.Printf("ultim8 %s by burg - a partial port of ucodenet to Go\n", ultim8.Version)
-	fmt.Println("usage: ./ultim8 [-h -a 127.0.0.1:64 -timeout 3] FILE [FILES]")
+	fmt.Printf("ugo %s by burg - a partial port of ucodenet to Go\n", ugo.Version)
+	fmt.Println("usage: ./ugo [-h -a 127.0.0.1:64 -timeout 3] FILE [FILES]")
 }
 
 func main() {
@@ -24,22 +24,22 @@ func main() {
 		timeoutSeconds = 1
 		mount          = false
 	)
-	if s := os.Getenv("ULTIM8"); s != "" {
+	if s := os.Getenv("UGO"); s != "" {
 		address = s
 	}
 	flag.StringVar(&address, "a", address, "network address:port for the TCP connection to your 1541Ultimate")
 	flag.IntVar(&timeoutSeconds, "timeout", timeoutSeconds, "connection timeout in seconds")
 	flag.BoolVar(&mount, "m", mount, "always mount, never reset")
 	flag.Parse()
-	ultim8.DialTimeout = time.Duration(timeoutSeconds) * time.Second
+	ugo.DialTimeout = time.Duration(timeoutSeconds) * time.Second
 	n := flag.NArg()
 	if n < 1 {
 		printUsage()
 		return
 	}
-	u, err := ultim8.New(address)
+	u, err := ugo.New(address)
 	if err != nil {
-		log.Fatalf("ultim8.New %q failed: %v", address, err)
+		log.Fatalf("ugo.New %q failed: %v", address, err)
 	}
 	defer u.Close()
 
@@ -57,7 +57,7 @@ func main() {
 	return
 }
 
-func process(u *ultim8.Manager, path string, mount bool) error {
+func process(u *ugo.Manager, path string, mount bool) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("os.Open %q failed: %v", path, err)
@@ -75,7 +75,7 @@ func process(u *ultim8.Manager, path string, mount bool) error {
 	return nil
 }
 
-func processMulti(u *ultim8.Manager, files []string, mount bool) error {
+func processMulti(u *ugo.Manager, files []string, mount bool) error {
 	f, err := os.Open(files[0])
 	if err != nil {
 		return fmt.Errorf("os.Open %q failed: %v", files[0], err)

@@ -1,4 +1,4 @@
-package ultim8
+package ugo
 
 import (
 	"bytes"

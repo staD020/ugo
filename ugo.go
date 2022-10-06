@@ -1,7 +1,7 @@
-// Package ultim8 provides 1541Ultimate control to start programs and disks via TCP.
+// Package ugo provides 1541Ultimate control to start programs and disks via TCP.
 //
 // It is a partial port of Ucodenet by TTL (https://csdb.dk/release/?id=189723) in pure Go by burg.
-package ultim8
+package ugo
 
 import (
 	"bytes"
