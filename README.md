@@ -25,7 +25,6 @@ Error handling omitted, see source for more options.
 package main
 
 import (
-    "fmt"
     "os"
     "github.com/staD020/ugo"
 )
