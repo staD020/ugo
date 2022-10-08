@@ -13,14 +13,10 @@ import (
 	"github.com/staD020/ugo"
 )
 
-func printUsage() {
-	fmt.Printf("ugo %s by burg - a partial port of ucodenet to Go\n", ugo.Version)
-	fmt.Println("usage: ./ugo [-h -a 192.168.2.64:64 -timeout 3] FILE [FILES]")
-}
-
 func main() {
 	var (
 		address        = "192.168.2.64:64"
+		help           = false
 		timeoutSeconds = 1
 		mount          = false
 	)
@@ -30,10 +26,17 @@ func main() {
 	flag.StringVar(&address, "a", address, "network address:port for the TCP connection to your 1541Ultimate")
 	flag.IntVar(&timeoutSeconds, "timeout", timeoutSeconds, "connection timeout in seconds")
 	flag.BoolVar(&mount, "m", mount, "always mount, never reset")
+	flag.BoolVar(&help, "h", help, "help")
+	flag.BoolVar(&help, "help", help, "show help")
 	flag.Parse()
 	ugo.DialTimeout = time.Duration(timeoutSeconds) * time.Second
+	if help {
+		printHelp()
+		return
+	}
 	n := flag.NArg()
 	if n < 1 {
+		fmt.Printf("ugo %s by burg - a partial port of ucodenet to Go\n", ugo.Version)
 		printUsage()
 		return
 	}
@@ -114,4 +117,59 @@ func processMulti(u *ugo.Manager, files []string, mount bool) error {
 		}
 	}
 	return nil
+}
+
+func printUsage() {
+	fmt.Println("usage: ./ugo [-h -a 192.168.2.64:64 -timeout 3] FILE [FILES]")
+}
+
+func printHelp() {
+	fmt.Println()
+	fmt.Printf("# UGO %v by Burglar\n", ugo.Version)
+	fmt.Println()
+	fmt.Println("Ugo provides 1541Ultimate control to run and mount C64 programs and disks via TCP.")
+	fmt.Println("It is a partial port of [Ucodenet](https://csdb.dk/release/?id=189723) by TTL in pure Go by burg.")
+	fmt.Println()
+	fmt.Println("## Features")
+	fmt.Println()
+	fmt.Println(" - Resets, Mounts and runs prg/d64/d71/d81 files transparently.")
+	fmt.Println(" - Supports multidisk and flip disk, just hit enter at the turn disk part.")
+	fmt.Println(" - Force mount (no reset, no run) with the -m flag.")
+	fmt.Println()
+	fmt.Println("## Install Library")
+	fmt.Println()
+	fmt.Println("`go get github.com/staD020/ugo`")
+	fmt.Println()
+	fmt.Println("## Use Library")
+	fmt.Println()
+	fmt.Println("Error handling omitted, see source for more options.")
+	fmt.Println()
+	fmt.Println("```go")
+	fmt.Println("package main")
+	fmt.Println()
+	fmt.Println("import (")
+	fmt.Println("    \"os\"")
+	fmt.Println("    \"github.com/staD020/ugo\"")
+	fmt.Println(")")
+	fmt.Println()
+	fmt.Println("func main() {")
+	fmt.Println("    f, _ := os.Open(\"file.prg\")")
+	fmt.Println("    defer f.Close()")
+	fmt.Println("    u, _ := ugo.New(\"192.168.2.64:64\")")
+	fmt.Println("    defer u.Close()")
+	fmt.Println("    _ = u.Run(f)")
+	fmt.Println("    return")
+	fmt.Println("}")
+	fmt.Println("```")
+	fmt.Println()
+	fmt.Println("## Install Command-line Interface")
+	fmt.Println()
+	fmt.Println("`go install github.com/staD020/ugo/cmd/ugo@latest`")
+	fmt.Println()
+	printUsage()
+	fmt.Println()
+	fmt.Println("## Options")
+	fmt.Println()
+	flag.PrintDefaults()
+	fmt.Println()
 }

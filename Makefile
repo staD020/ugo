@@ -11,6 +11,13 @@ $(TARGET): $(SRC)
 
 cross: ugo_linux_amd64 ugo_darwin_arm64 ugo_darwin_amd64 ugo_win_amd64.exe ugo_win_x86.exe
 
+test: $(TARGET)
+	go test -v -cover -race
+	./$(TARGET) -a localhost:6464 testdata/evoluer.prg
+
+install: $(TARGET)
+	sudo cp $(TARGET) /usr/local/bin/
+
 ugo_linux_amd64: $(SRC)
 	CGO_ENABLED=$(CGO) go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)" -o $@ ./cmd/ugo/
 
@@ -25,13 +32,6 @@ ugo_win_amd64.exe: $(SRC)
 
 ugo_win_x86.exe: $(SRC)
 	CGO_ENABLED=$(CGO) GOOS=windows GOARCH=386 go build $(GOBUILDFLAGS) -ldflags="$(LDFLAGS)" -o $@ ./cmd/ugo/
-
-test: $(TARGET)
-	go test -v -cover -race
-	./$(TARGET) -a localhost:6464 testdata/evoluer.prg
-
-install: $(TARGET)
-	sudo cp $(TARGET) /usr/local/bin/
 
 clean:
 	rm -f $(TARGET) ugo_linux_amd64 ugo_darwin_arm64 ugo_darwin_amd64 ugo_win_amd64.exe ugo_win_x86.exe
