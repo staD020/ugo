@@ -45,10 +45,11 @@ usage: ./ugo [-h -a 192.168.2.64:64 -timeout 3] FILE [FILES]
 ## Options
 
   -a string
-        network address:port for the TCP connection to your 1541Ultimate (default "192.168.2.64:64")
-  -h    help
+    	network address:port for the TCP connection to your 1541Ultimate (default "192.168.2.64:64")
+  -h	help
   -help
-        show help
-  -m    always mount, never reset
+    	show help
+  -m	always mount, never reset
   -timeout int
-        connection timeout in seconds (default 1)
+    	connection timeout in seconds (default 1)
+

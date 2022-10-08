@@ -31,6 +31,7 @@ func main() {
 	flag.Parse()
 	ugo.DialTimeout = time.Duration(timeoutSeconds) * time.Second
 	if help {
+		flag.CommandLine.SetOutput(os.Stdout)
 		printHelp()
 		return
 	}
