@@ -81,7 +81,7 @@ func processMulti(u *ugo.Manager, files []string, mount bool) error {
 		return fmt.Errorf("os.Open %q failed: %v", files[0], err)
 	}
 	defer f.Close()
-	var fn func(f io.Reader) error
+	var fn func(io.Reader) error
 	a := "u.Run"
 	fn = u.Run
 	if mount {
