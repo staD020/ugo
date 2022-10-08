@@ -171,6 +171,8 @@ func printHelp() {
 	fmt.Println()
 	fmt.Println("## Options")
 	fmt.Println()
+	fmt.Println("```")
 	flag.PrintDefaults()
+	fmt.Println("```")
 	fmt.Println()
 }
