@@ -125,7 +125,7 @@ func printUsage() {
 
 func printHelp() {
 	fmt.Println()
-	fmt.Printf("# UGO %v by Burglar\n", ugo.Version)
+	fmt.Println("# ugo", ugo.Version)
 	fmt.Println()
 	fmt.Println("Ugo provides 1541Ultimate control to run and mount C64 programs and disks via TCP.")
 	fmt.Println("It is a partial port of [Ucodenet](https://csdb.dk/release/?id=189723) by TTL in pure Go by burg.")

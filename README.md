@@ -1,3 +1,4 @@
+
 # ugo 0.1
 
 Ugo provides 1541Ultimate control to run and mount C64 programs and disks via TCP.
@@ -12,10 +13,6 @@ It is a partial port of [Ucodenet](https://csdb.dk/release/?id=189723) by TTL in
 ## Install Library
 
 `go get github.com/staD020/ugo`
-
-## Install Command-line Interface
-
-`go install github.com/staD020/ugo@latest`
 
 ## Use Library
 
@@ -38,3 +35,20 @@ func main() {
     return
 }
 ```
+
+## Install Command-line Interface
+
+`go install github.com/staD020/ugo/cmd/ugo@latest`
+
+usage: ./ugo [-h -a 192.168.2.64:64 -timeout 3] FILE [FILES]
+
+## Options
+
+  -a string
+        network address:port for the TCP connection to your 1541Ultimate (default "192.168.2.64:64")
+  -h    help
+  -help
+        show help
+  -m    always mount, never reset
+  -timeout int
+        connection timeout in seconds (default 1)
