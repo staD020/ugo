@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/staD020/ugo"
@@ -47,16 +49,19 @@ func main() {
 	}
 	defer u.Close()
 
-	if n > 1 {
-		if err = processMulti(u, flag.Args(), mount); err != nil {
-			log.Fatalf("processMulti %v failed: %v", flag.Args(), err)
+	files, err := expandWildcards(flag.Args())
+	if err != nil {
+		log.Fatalf("expandWildcards %v failed: %v", flag.Args(), err)
+	}
+	if len(files) > 1 {
+		if err = processMulti(u, files, mount); err != nil {
+			log.Fatalf("processMulti %v failed: %v", files, err)
 		}
 		return
 	}
 
-	path := flag.Args()[0]
-	if err = process(u, path, mount); err != nil {
-		log.Fatalf("process %q failed: %v", path, err)
+	if err = process(u, files[0], mount); err != nil {
+		log.Fatalf("process %q failed: %v", files[0], err)
 	}
 	return
 }
@@ -118,6 +123,34 @@ func processMulti(u *ugo.Manager, files []string, mount bool) error {
 		}
 	}
 	return nil
+}
+
+func expandWildcards(filenames []string) (result []string, err error) {
+	for _, filename := range filenames {
+		if !strings.ContainsAny(filename, "?*") {
+			result = append(result, filename)
+			continue
+		}
+		dir := filepath.Dir(filename)
+		ff, err := os.ReadDir(dir)
+		if err != nil {
+			return nil, fmt.Errorf("os.ReadDir %q failed: %w", dir, err)
+		}
+		name := filepath.Base(filename)
+		for _, f := range ff {
+			if f.IsDir() {
+				continue
+			}
+			ok, err := filepath.Match(name, f.Name())
+			if err != nil {
+				return nil, fmt.Errorf("filepath.Match %q failed: %w", filename, err)
+			}
+			if ok {
+				result = append(result, filepath.Join(dir, f.Name()))
+			}
+		}
+	}
+	return result, nil
 }
 
 func printUsage() {
