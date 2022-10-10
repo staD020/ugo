@@ -14,6 +14,7 @@ import (
 )
 
 // DialTimeout contains timeout for the initial TCP connection to your 1541u.
+// Modifying it affects all following calls to ugo.New().
 var DialTimeout = 3 * time.Second
 
 const (
@@ -158,6 +159,7 @@ func (m *Manager) Close() error {
 
 // backgroundReader listen to responses from the 1541u and prints them to stdout.
 // It signals the m.done channel when the connection is closed or on error.
+// Callers are expected to use a goroutine for this method.
 func (m *Manager) backgroundReader() {
 	defer func() { m.done <- true }()
 LOOP:
@@ -166,6 +168,7 @@ LOOP:
 		n, err := io.Copy(&buf, m.c)
 		switch {
 		case err == nil && n > 0:
+			fmt.Println()
 			fmt.Println("[1541U] ", buf.String())
 			continue LOOP
 		case errors.Is(err, net.ErrClosed):
@@ -179,7 +182,7 @@ LOOP:
 			return
 		}
 		fmt.Println()
-		log.Fatal("[1541U] Connection closed unexpectedly")
+		fmt.Println("[1541U] Connection closed unexpectedly")
 		return
 	}
 }

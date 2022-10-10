@@ -43,6 +43,7 @@ func main() {
 		printUsage()
 		return
 	}
+
 	u, err := ugo.New(address)
 	if err != nil {
 		log.Fatalf("ugo.New %q failed: %v", address, err)
@@ -59,7 +60,6 @@ func main() {
 		}
 		return
 	}
-
 	if err = process(u, files[0], mount); err != nil {
 		log.Fatalf("process %q failed: %v", files[0], err)
 	}
