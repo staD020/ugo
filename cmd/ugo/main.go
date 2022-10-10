@@ -91,10 +91,10 @@ func processMulti(u *ugo.Manager, files []string, mount bool) error {
 	}
 	defer f.Close()
 	var fn func(io.Reader) error
-	a := "u.Run"
+	a := "Run"
 	fn = u.Run
 	if mount {
-		a = "u.Mount"
+		a = "Mount"
 		fn = u.Mount
 	}
 	fmt.Printf("Multi mode, %s image %q\n", a, files[0])
