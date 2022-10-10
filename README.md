@@ -42,6 +42,10 @@ func main() {
 
 usage: ./ugo [-h -a 192.168.2.64:64 -timeout 3] FILE [FILES]
 
+You can also set your 1541u's address with environment variable UGO.
+
+`export UGO=10.1.1.64:64`
+
 ## Options
 
 ```
