@@ -166,7 +166,7 @@ func printHelp() {
 	fmt.Println()
 	fmt.Println("## Features")
 	fmt.Println()
-	fmt.Println(" - Resets, Mounts and runs prg/d64/d71/d81 files transparently.")
+	fmt.Println(" - Resets, Mounts and runs .prg and .d64 files transparently.")
 	fmt.Println(" - Supports multidisk and flip disk, just hit enter at the turn disk part.")
 	fmt.Println(" - Force mount (no reset, no run) with the -m flag.")
 	fmt.Println()

@@ -12,6 +12,12 @@ $(TARGET): $(SRC)
 
 cross: $(CROSS_TARGETS)
 
+dist: $(CROSS_TARGETS)
+	mkdir ugo-0.1
+	cp ugo_*6* ugo-0.1/
+	cp README.md ugo-0.1/
+	zip -r ugo-0.1.zip ugo-0.1
+
 test: $(TARGET)
 	go test -v -cover -race
 	./$(TARGET) -a localhost:6464 testdata/evoluer.prg

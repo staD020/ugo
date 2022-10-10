@@ -6,7 +6,7 @@ It is a partial port of [Ucodenet](https://csdb.dk/release/?id=189723) by TTL in
 
 ## Features
 
- - Resets, Mounts and runs prg/d64/d71/d81 files transparently.
+ - Resets, Mounts and runs .prg and .d64 files transparently.
  - Supports multidisk and flip disk, just hit enter at the turn disk part.
  - Force mount (no reset, no run) with the -m flag.
 
