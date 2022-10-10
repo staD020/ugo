@@ -104,7 +104,7 @@ func processMulti(u *ugo.Manager, files []string, mount bool) error {
 
 	r := bufio.NewReader(os.Stdin)
 	for i := 1; i < len(files); i++ {
-		fmt.Printf("Press enter to mount next image %q", files[i])
+		fmt.Printf("Press enter to mount next image %q\n", files[i])
 		_, err = r.ReadString('\n')
 		switch {
 		case errors.Is(err, io.EOF):

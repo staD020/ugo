@@ -4,7 +4,7 @@
 package ugo
 
 import (
-	"bytes"
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -164,24 +164,18 @@ func (m *Manager) backgroundReader() {
 	defer func() { m.done <- true }()
 LOOP:
 	for {
-		var buf bytes.Buffer
-		n, err := io.Copy(&buf, m.c)
+		s, err := bufio.NewReader(m.c).ReadString('\n')
 		switch {
-		case err == nil && n > 0:
-			fmt.Println()
-			fmt.Println("[1541U] ", buf.String())
+		case err == nil && s != "":
+			fmt.Print("[1541U] ", s)
 			continue LOOP
-		case errors.Is(err, net.ErrClosed):
+		case errors.Is(err, net.ErrClosed) || errors.Is(err, io.EOF):
 			fmt.Println("[1541U] Connection closed")
-			return
-		case errors.Is(err, io.EOF):
-			fmt.Println("[1541U] EOF")
 			return
 		case err != nil:
 			log.Printf("backgroundReader io.Copy failed: %v", err)
 			return
 		}
-		fmt.Println()
 		fmt.Println("[1541U] Connection closed unexpectedly")
 		return
 	}
