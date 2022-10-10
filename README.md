@@ -50,7 +50,7 @@ You can also set your 1541u's address with environment variable UGO.
 
 ```
   -a string
-    	network address:port for the TCP connection to your 1541Ultimate (default "192.168.2.64:64")
+    	network address:port for the TCP connection to your 1541Ultimate (default "localhost:6464")
   -h	help
   -help
     	show help
