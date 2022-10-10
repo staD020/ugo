@@ -19,7 +19,7 @@ var DialTimeout = 3 * time.Second
 
 const (
 	D64Size = 174848
-	Version = "0.1"
+	Version = "0.2-dev"
 )
 
 // Command specifies the various commands you can send to the 1541u.
