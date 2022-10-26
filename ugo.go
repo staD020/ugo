@@ -53,7 +53,7 @@ func (c Command) Bytes(length int) []byte {
 	return append(buf, byte(length&0xff), byte(length>>8))
 }
 
-// String returns the string representation of the command.
+// String returns the string representation of the command, implementing the fmt.Stringer interface.
 func (c Command) String() string {
 	s := "n/a"
 	switch c {
@@ -73,9 +73,10 @@ func (c Command) String() string {
 
 // Manager is the struct containing the net.Conn to your 1541u.
 type Manager struct {
-	addr string
-	c    net.Conn
-	done chan bool
+	addr     string
+	c        net.Conn
+	done     chan bool
+	IsClosed bool // IsClosed is set to true on Close or when connection is lost.
 }
 
 // New establishes a new TCP connection your 1541u and returns the connection Manager.
@@ -153,7 +154,13 @@ func (m *Manager) Mount(r io.Reader) error {
 
 // Close closes the TCP connection and waits for clean disconnect.
 func (m *Manager) Close() error {
-	defer func() { <-m.done }()
+	if m.IsClosed {
+		return nil
+	}
+	defer func() {
+		<-m.done
+		m.IsClosed = true
+	}()
 	return m.c.Close()
 }
 
