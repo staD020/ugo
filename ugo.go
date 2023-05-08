@@ -119,14 +119,10 @@ func (m *Manager) Reset() error {
 }
 
 // Run drains the input Reader and uploads it to the 1541u with Command cmd.
-// Before upload, the Reset Command is sent.
 func (m *Manager) Run(r io.Reader) error {
 	buf, err := io.ReadAll(r)
 	if err != nil {
 		return fmt.Errorf("io.ReadAll failed: %w", err)
-	}
-	if err = m.Reset(); err != nil {
-		return fmt.Errorf("Reset failed: %w", err)
 	}
 	cmd := DMARun
 	if len(buf) >= D64Size {
