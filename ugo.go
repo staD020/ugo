@@ -69,6 +69,8 @@ func (c Command) String() string {
 		s = "MountImage"
 	case Keyboard:
 		s = "Keyboard"
+	case DMAWrite:
+		s = "DMAWrite"
 	}
 	return fmt.Sprintf("%-10s 0x%04x", s, uint16(c))
 }
